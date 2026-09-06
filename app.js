@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MODEL_URL, GROUPS, MUSCLES, EXERCISES, IDLE } from './data.js';
+import { loadVercelAnalytics, startPresence } from './analytics.js';
 
 const $ = id => document.getElementById(id);
 const MAXC = 48;
@@ -524,6 +525,15 @@ function frame(now) {
   renderer.render(scene, camera);
 }
 buildBodyMap();
+/* ================= tracking ================= */
+loadVercelAnalytics();
+startPresence(stats => {
+  const el = $('live');
+  if (!stats) { el.hidden = true; return; }
+  $('live-n').textContent = Math.max(1, stats.live).toLocaleString();
+  $('uniq-n').textContent = stats.unique.toLocaleString();
+  el.hidden = false;
+});
 requestAnimationFrame(frame);
 // debug / automation hook
 window.__mm = { project: (x, y, z) => { const v = new THREE.Vector3(x, y, z).project(camera); return [(v.x * 0.5 + 0.5) * innerWidth, (-v.y * 0.5 + 0.5) * innerHeight]; }, current: () => current?.id, selected: () => selectedMuscle, camInfo: () => ({ pos: camera.position.toArray().map(n => +n.toFixed(2)), target: controls.target.toArray().map(n => +n.toFixed(2)), anim: camAnim.active, mode: camMode }), selectExercise: id => selectExercise(id, true), selectMuscle, setPhase: p => { phase = p; playing = false; }, play: () => { playing = true; }, isReady: () => ready, cam: (az, el, dist, target) => { camFrom({ az, el, dist, target }); camAnim.t = 1; camera.position.copy(camAnim.toP); controls.target.copy(camAnim.toT); camAnim.active = false; }, gear: () => ({ barbell: gear.barbell.visible ? gear.barbell.position.toArray() : null, bench: gear.bench.visible ? { pos: gear.bench.position.toArray(), size: gear.bench.userData.top.scale.toArray() } : null, hands: [handPoint('Left', new THREE.Vector3()).toArray(), handPoint('Right', new THREE.Vector3()).toArray()], dumbbells: gear.dumbbells[0].visible ? gear.dumbbells.map(d => d.position.toArray()) : null }), bones: () => Object.fromEntries(Object.entries(B).map(([k, b]) => [k, b.getWorldPosition(new THREE.Vector3()).toArray().map(n => +n.toFixed(2))])) };
