@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MuscleMap</title>
+<meta name="description" content="Click a muscle, watch the lift, see exactly where it hits.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230b0d11%27/%3E%3Cpath d=%27M8 22V10l8 7 8-7v12%27 fill=%27none%27 stroke=%27%23c8ff2e%27 stroke-width=%273.2%27 stroke-linejoin=%27round%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="labels" class="labels"></div>
+
+<div class="loader" id="loader"><div class="bar"><i id="loader-bar"></i></div><span id="loader-text">Loading athlete</span></div>
+
+<header class="brand">
+  <div class="logo"><svg viewBox="0 0 32 32" width="28" height="28"><rect width="32" height="32" rx="8" fill="#c8ff2e"/><path d="M8 22V10l8 7 8-7v12" fill="none" stroke="#0b0d11" stroke-width="3.2" stroke-linejoin="round"/></svg><span>MuscleMap</span></div>
+  <p>Click a muscle. Watch the lift. See exactly where it hits.</p>
+</header>
+
+<aside class="panel body-map" id="body-map">
+  <div class="ph"><h2>Body map</h2><span class="tag" id="muscle-count"></span></div>
+  <div class="groups" id="groups"></div>
+  <div class="pf"><span>Drag to orbit · Scroll to zoom · Click the body to pick a muscle</span></div>
+</aside>
+
+<aside class="panel exercise" id="exercise-panel">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="ex-head" id="ex-head">
+    <div>
+      <div class="kicker" id="ex-kicker">Exercise</div>
+      <h2 id="ex-name">Select a muscle</h2>
+    </div>
+    <div class="equip" id="ex-equip"></div>
+  </div>
+  <div class="controls">
+    <button class="play" id="play" aria-label="Play or pause"><svg viewBox="0 0 16 16" width="16" height="16"><path id="play-icon" d="M4 3l9 5-9 5z" fill="currentColor"/></svg></button>
+    <div class="tempo"><div class="lab"><span>Tempo</span><b id="tempo-val">3.0 s / rep</b></div><input type="range" id="tempo" min="15" max="60" value="30"></div>
+    <div class="reps"><b id="rep-count">0</b><span>reps</span></div>
+  </div>
+  <div class="impact"><h3>Muscle impact</h3><div id="impact-bars"></div></div>
+  <div class="two">
+    <div><h3>Form cues</h3><ul id="cues"></ul></div>
+    <div><h3>Watch out for</h3><ul id="mistakes"></ul></div>
+  </div>
+</aside>
+
+<div class="topbar">
+  <div class="search"><svg viewBox="0 0 16 16" width="14" height="14"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6"/></svg><input id="search" placeholder="Search any exercise" autocomplete="off"><div class="results" id="results"></div></div>
+</div>
+<div class="dock" id="dock"><div class="chips" id="chips"></div></div>
+
+
+<div class="views" id="views">
+  <button data-cam="front" title="Front">F</button>
+  <button data-cam="side" title="Side">S</button>
+  <button data-cam="back" title="Back">B</button>
+  <button data-cam="auto" class="on" title="Exercise view">A</button>
+</div>
+
+
+<div class="fps" id="fps"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
