@@ -27,7 +27,7 @@ const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
 
 const camera = new THREE.PerspectiveCamera(32, 1, 0.05, 60);
-camera.position.set(2.2, 1.6, 3.4);
+camera.position.set(2.4, 1.65, 3.75);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.target.set(0, 1.0, 0);
@@ -322,7 +322,7 @@ function camFrom(preset) {
   camAnim.fromP.copy(camera.position); camAnim.fromT.copy(controls.target);
   camAnim.active = true; camAnim.t = 0; camAnim.start = performance.now();
 }
-const VIEW = { front: { az: 8, el: 10, dist: 3.8, target: [0, 1.0, 0] }, side: { az: 90, el: 10, dist: 3.8, target: [0, 1.0, 0] }, back: { az: 180, el: 10, dist: 3.8, target: [0, 1.0, 0] } };
+const VIEW = { front: { az: 8, el: 10, dist: 4.3, target: [0, 0.98, 0] }, side: { az: 90, el: 10, dist: 4.3, target: [0, 0.98, 0] }, back: { az: 180, el: 10, dist: 4.3, target: [0, 0.98, 0] } };
 controls.addEventListener('start', () => { camAnim.active = false; controls.autoRotate = false; });
 
 /* ================= UI: body map ================= */

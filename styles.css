@@ -29,11 +29,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;paddin
 .brand{position:fixed;left:24px;top:22px;z-index:10}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.04em;text-transform:uppercase}
 .brand p{color:var(--ink2);font-size:12.5px;margin-top:4px}
-.live{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:11.5px;color:var(--ink2);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 8px;backdrop-filter:blur(12px)}
+.live{position:fixed;right:24px;top:24px;z-index:10;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 10px 4px 8px;backdrop-filter:blur(12px)}
 .live i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:blink 2.2s ease-in-out infinite}
 .live b{color:var(--ink);font-family:var(--mono);font-weight:500}
 .live .sep{width:1px;height:10px;background:var(--line2);margin:0 2px}
 @keyframes blink{50%{opacity:.35}}
+.live[hidden]{display:none}
 
 .panel{position:fixed;background:var(--panel);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);z-index:10}
 .body-map{left:24px;top:110px;width:236px;max-height:calc(100vh - 230px);display:flex;flex-direction:column}
