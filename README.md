@@ -32,12 +32,14 @@ Two layers, both anonymous (no cookies, no personal data):
    project open the *Analytics* tab and click *Enable*. The page already loads the script.
 2. **Live and total unique users** — `api/presence.mjs` counts heartbeats in Redis and the app
    shows "N training now · M lifters so far". Setup, once:
-   - In the Vercel project go to *Storage* → *Create Database* → **Upstash Redis** (free tier).
-     Connecting it adds `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` automatically.
-   - Redeploy. `GET /api/presence` returns `{ live, unique, today }` at any time.
+   - Create a free database at https://console.upstash.com (Free plan, no card). Do not use the
+     Upstash listing inside Vercel's marketplace: that one has no free plan.
+   - Copy `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the database page into the
+     Vercel project (*Settings* → *Environment Variables*). Redeploy.
+   - `GET /api/presence` returns `{ live, unique, today }` at any time.
 
 Live = distinct visitors seen in the last 60 seconds. Unique = distinct anonymous ids ever
 (HyperLogLog, ±1%). Without the Redis env vars the API returns 503 and the pill stays hidden.
 
-Cost: everything runs on free tiers (Vercel Hobby, Vercel Web Analytics free cap, Upstash free
-tier). A heartbeat costs 4 Redis commands every 45 s; a new browser costs 3 more, once.
+Cost: everything runs on free tiers (Vercel Hobby, Vercel Web Analytics free cap, Upstash's own
+free plan). A heartbeat costs 4 Redis commands every 45 s; a new browser costs 3 more, once.
