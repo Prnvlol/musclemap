@@ -9,7 +9,7 @@ export function loadVercelAnalytics() {
   document.head.appendChild(s);
 }
 
-export function startPresence(onStats, intervalMs = 25000) {
+export function startPresence(onStats, intervalMs = 45000) {
   if (isLocal) return;
   let id;
   try { id = localStorage.getItem('mm_uid'); if (!id) { id = crypto.randomUUID().replace(/-/g, ''); localStorage.setItem('mm_uid', id); } }
@@ -19,9 +19,11 @@ export function startPresence(onStats, intervalMs = 25000) {
   async function beat() {
     if (document.hidden) return;
     try {
-      const r = await fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      let register = false; try { register = localStorage.getItem('mm_uid_reg') !== id; } catch { register = true; }
+      const r = await fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, register }) });
       if (!r.ok) { if (++failures >= 2) stop(); return; }
-      failures = 0; onStats(await r.json());
+      failures = 0; if (register) { try { localStorage.setItem('mm_uid_reg', id); } catch {} }
+      onStats(await r.json());
     } catch { if (++failures >= 2) stop(); }
   }
   beat(); timer = setInterval(beat, intervalMs);

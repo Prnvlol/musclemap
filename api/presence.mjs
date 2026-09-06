@@ -2,7 +2,9 @@
 // Storage: Upstash Redis over REST (free tier). Env: UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
 //   live   -> sorted set of ids scored by last heartbeat; a user is live if seen in the last 60 s
 //   uniq:all, uniq:YYYY-MM-DD -> HyperLogLog counts of distinct ids (all-time, per day)
-// POST { id }  registers a heartbeat and returns counts.   GET returns counts only.
+// POST { id, register }  heartbeat (register=true only on a browser's very first visit, so the
+// unique counter costs one command per new user, not per heartbeat).   GET returns counts only.
+// Budget: 4 Redis commands per heartbeat, heartbeat every 45 s -> ~50 commands per 10-minute visit.
 const URL = process.env.UPSTASH_REDIS_REST_URL;
 const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const LIVE_WINDOW_MS = 60_000;
@@ -21,20 +23,24 @@ export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'method' });
   const now = Date.now();
   const day = new Date(now).toISOString().slice(0, 10);
-  let id = null;
+  let id = null, register = false;
   if (req.method === 'POST') {
     let body = req.body;
     if (typeof body === 'string') { try { body = JSON.parse(body || '{}'); } catch { body = {}; } }
     id = String((body && body.id) || '');
     if (!/^[A-Za-z0-9_-]{8,64}$/.test(id)) return res.status(400).json({ error: 'bad id' });
+    register = !!(body && body.register);
   }
   const cmds = [['ZREMRANGEBYSCORE', 'live', '-inf', String(now - LIVE_WINDOW_MS)]];
-  if (id) cmds.push(['ZADD', 'live', String(now), id], ['PFADD', 'uniq:all', id], ['PFADD', `uniq:${day}`, id], ['EXPIRE', `uniq:${day}`, String(DAY_TTL_S)]);
-  cmds.push(['ZCARD', 'live'], ['PFCOUNT', 'uniq:all'], ['PFCOUNT', `uniq:${day}`]);
+  if (id) cmds.push(['ZADD', 'live', String(now), id]);
+  if (id && register) cmds.push(['PFADD', 'uniq:all', id], ['PFADD', `uniq:${day}`, id], ['EXPIRE', `uniq:${day}`, String(DAY_TTL_S)]);
+  cmds.push(['ZCARD', 'live'], ['PFCOUNT', 'uniq:all']);
+  if (req.method === 'GET') cmds.push(['PFCOUNT', `uniq:${day}`]);
   try {
     const out = await redis(cmds);
     const n = out.length;
-    return res.status(200).json({ live: out[n - 3], unique: out[n - 2], today: out[n - 1] });
+    if (req.method === 'GET') return res.status(200).json({ live: out[n - 3], unique: out[n - 2], today: out[n - 1] });
+    return res.status(200).json({ live: out[n - 2], unique: out[n - 1] });
   } catch (e) {
     return res.status(502).json({ error: 'storage unavailable' });
   }

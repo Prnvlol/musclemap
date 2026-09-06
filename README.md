@@ -38,3 +38,6 @@ Two layers, both anonymous (no cookies, no personal data):
 
 Live = distinct visitors seen in the last 60 seconds. Unique = distinct anonymous ids ever
 (HyperLogLog, ±1%). Without the Redis env vars the API returns 503 and the pill stays hidden.
+
+Cost: everything runs on free tiers (Vercel Hobby, Vercel Web Analytics free cap, Upstash free
+tier). A heartbeat costs 4 Redis commands every 45 s; a new browser costs 3 more, once.
