@@ -38,6 +38,11 @@ Two layers, both anonymous (no cookies, no personal data):
      Vercel project (*Settings* → *Environment Variables*). Redeploy.
    - `GET /api/presence` returns `{ live, unique, today }` at any time.
 
+Only the production host in `PROD_HOSTS` (analytics.js) is counted, so preview deployment URLs
+and localhost never inflate the numbers; automated browsers are skipped too. To exclude your own
+browser open the site once with `?notrack=1` (`?track=1` undoes it). Counts are per browser
+profile, not per person: a phone, a laptop and a private window are three "lifters".
+
 Live = distinct visitors seen in the last 60 seconds. Unique = distinct anonymous ids ever
 (HyperLogLog, ±1%). Without the Redis env vars the API returns 503 and the pill stays hidden.
 
